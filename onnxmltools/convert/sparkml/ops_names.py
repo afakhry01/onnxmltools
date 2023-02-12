@@ -92,8 +92,6 @@ def get_sparkml_operator_name(model_type):
             raise ValueError("Estimator must be fitted before being converted to ONNX")
         else:
             raise ValueError("Unknown model type: {}".format(model_type))
-    
-    if model_type not in sparkml_operator_name_map:
-        raise ValueError("No proper operator name found for '%s'" % model_type)
+
     return sparkml_operator_name_map[model_type]
 
