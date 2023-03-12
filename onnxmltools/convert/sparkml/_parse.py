@@ -6,7 +6,7 @@ from .ops_input_output import get_input_names, get_output_names
 
 from ..common._container import SparkmlModelContainer
 from ..common._topology import Topology
-from ..common._registration import get_converter, _converter_pool
+from ..common._registration import get_converter
 
 from pyspark.ml import PipelineModel
 
@@ -46,9 +46,9 @@ def _parse_sparkml_simple_model(spark, scope, model, global_inputs, output_dict)
     :param output_dict: An accumulated list of output_original_name->(ref_count, variable)
     :return: A list of output variables which will be passed to next stage
     '''
-    if type(model) in _converter_pool:
+    try:
         this_operator = scope.declare_local_operator(get_converter(type(model)), model)
-    else:
+    except ValueError:
         this_operator = scope.declare_local_operator(get_sparkml_operator_name(type(model)), model)
     this_operator.raw_params = {'SparkSession': spark}
     raw_input_names = get_input_names(model)
