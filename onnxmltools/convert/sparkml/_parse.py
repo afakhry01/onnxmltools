@@ -6,6 +6,7 @@ from .ops_input_output import get_input_names, get_output_names
 
 from ..common._container import SparkmlModelContainer
 from ..common._topology import Topology
+from ..common._registration import get_converter, _converter_pool
 
 from pyspark.ml import PipelineModel
 
@@ -45,7 +46,10 @@ def _parse_sparkml_simple_model(spark, scope, model, global_inputs, output_dict)
     :param output_dict: An accumulated list of output_original_name->(ref_count, variable)
     :return: A list of output variables which will be passed to next stage
     '''
-    this_operator = scope.declare_local_operator(get_sparkml_operator_name(type(model)), model)
+    if type(model) in _converter_pool:
+        this_operator = scope.declare_local_operator(get_converter(type(model)), model)
+    else:
+        this_operator = scope.declare_local_operator(get_sparkml_operator_name(type(model)), model)
     this_operator.raw_params = {'SparkSession': spark}
     raw_input_names = get_input_names(model)
     this_operator.inputs = [_get_variable_for_input(scope, x, global_inputs, output_dict) for x in raw_input_names]
@@ -98,7 +102,8 @@ def parse_sparkml(spark, model, initial_types=None, target_opset=None,
                         initial_types=initial_types,
                         target_opset=target_opset,
                         custom_conversion_functions=custom_conversion_functions,
-                        custom_shape_calculators=custom_shape_calculators)
+                        custom_shape_calculators=custom_shape_calculators,
+                        )
 
     # Declare an object to provide variables' and operators' naming mechanism. In contrast to CoreML, one global scope
     # is enough for parsing spark-ml models.
