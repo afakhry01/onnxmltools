@@ -46,10 +46,7 @@ def _parse_sparkml_simple_model(spark, scope, model, global_inputs, output_dict)
     :param output_dict: An accumulated list of output_original_name->(ref_count, variable)
     :return: A list of output variables which will be passed to next stage
     '''
-    try:
-        this_operator = scope.declare_local_operator(get_converter(type(model)), model)
-    except ValueError:
-        this_operator = scope.declare_local_operator(get_sparkml_operator_name(type(model)), model)
+    this_operator = scope.declare_local_operator(get_sparkml_operator_name(type(model)), model)
     this_operator.raw_params = {'SparkSession': spark}
     raw_input_names = get_input_names(model)
     this_operator.inputs = [_get_variable_for_input(scope, x, global_inputs, output_dict) for x in raw_input_names]
