@@ -319,9 +319,12 @@ class XGBClassifierConverter(XGBConverter):
 
 
 def convert_xgboost(scope, operator, container):
+    print(operator.__dict__)
     xgb_node = operator.raw_operator
+    if isinstance(xgb_node, SparkXGBClassifierModel):
+        operator.raw_operator = operator.raw_operator._xgb_sklearn_model
+        xgb_node = operator.raw_operator
     if (isinstance(xgb_node, XGBClassifier) or
-            isinstance(xgb_node, SparkXGBClassifierModel) or
             getattr(xgb_node, 'operator_name', None) == 'XGBClassifier'):
         cls = XGBClassifierConverter
     else:
