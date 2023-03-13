@@ -141,6 +141,5 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     #     warnings.warn("Model '{0}' was already registered under alias "
     #                   "'{1}'.".format(model, sparkml_operator_name_map[model]))
     sparkml_operator_name_map[model] = alias
-    register_converter(alias, convert_fct, overwrite=overwrite,
-                       options=options)
+    register_converter(alias, convert_fct, overwrite=overwrite)
     register_shape_calculator(alias, shape_fct, overwrite=overwrite)
