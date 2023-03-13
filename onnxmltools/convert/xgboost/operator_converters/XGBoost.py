@@ -319,6 +319,8 @@ class XGBClassifierConverter(XGBConverter):
 
 def convert_xgboost(scope, operator, container):
     xgb_node = operator.raw_operator
+    print(type(xgb_node))
+    print(getattr(xgb_node, 'operator_name', None))
     if (isinstance(xgb_node, XGBClassifier) or
             getattr(xgb_node, 'operator_name', None) == 'XGBClassifier'):
         cls = XGBClassifierConverter
