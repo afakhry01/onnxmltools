@@ -208,3 +208,9 @@ def get_output_names(model):
     :return: list of output names
     """
     return io_name_map[get_sparkml_operator_name(type(model))][1](model)
+
+
+def update_io_name_map(alias, input_func, output_func):
+    io_name_map.update(
+        {alias: (input_func, output_func)}
+    )

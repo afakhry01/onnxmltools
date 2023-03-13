@@ -53,7 +53,6 @@ from pyspark.ml.clustering import KMeansModel
 from pyspark.ml.clustering import GaussianMixture
 from pyspark.ml.clustering import LDA
 
-from ..common._registration import register_converter, register_shape_calculator
 
 def build_sparkml_operator_name_map():
     res = {k: "pyspark.ml.feature." + k.__name__ for k in [
@@ -97,49 +96,7 @@ def get_sparkml_operator_name(model_type):
     return sparkml_operator_name_map[model_type]
 
 
-def update_registered_converter(model, alias, shape_fct, convert_fct,
-                                overwrite=True, parser=None, options=None):
-    """
-    Registers or updates a converter for a new model so that
-    it can be converted when inserted in a *scikit-learn* pipeline.
-
-    :param model: model class
-    :param alias: alias used to register the model
-    :param shape_fct: function which checks or modifies the expected
-        outputs, this function should be fast so that the whole graph
-        can be computed followed by the conversion of each model,
-        parallelized or not
-    :param convert_fct: function which converts a model
-    :param overwrite: False to raise exception if a converter
-        already exists
-    :param parser: overwrites the parser as well if not empty
-    :param options: registered options for this converter
-
-    The alias is usually the library name followed by the model name.
-    Example:
-
-    ::
-
-        from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
-        from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
-        from skl2onnx import update_registered_converter
-        update_registered_converter(
-                SGDClassifier, 'SklearnLinearClassifier',
-                calculate_linear_classifier_output_shapes,
-                convert_sklearn_random_forest_classifier,
-                options={'zipmap': [True, False, 'columns'],
-                         'output_class_labels': [False, True],
-                         'raw_scores': [True, False]})
-
-    The function does not update the parser if not specified except if
-    option `'zipmap'` is added to the list. Every classifier
-    must declare this option to let the default parser
-    automatically handle that option.
-    """  # noqa
-    # if (not overwrite and model in sparkml_operator_name_map
-    #         and alias != sparkml_operator_name_map[model]):
-    #     warnings.warn("Model '{0}' was already registered under alias "
-    #                   "'{1}'.".format(model, sparkml_operator_name_map[model]))
-    sparkml_operator_name_map[model] = alias
-    register_converter(alias, convert_fct, overwrite=overwrite)
-    register_shape_calculator(alias, shape_fct, overwrite=overwrite)
+def update_sparkml_operator_name_map(model_type, operator_name):
+    sparkml_operator_name_map.update(
+        {model_type: operator_name}
+    )

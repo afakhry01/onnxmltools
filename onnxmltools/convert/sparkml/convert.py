@@ -6,6 +6,9 @@ from ..common.onnx_ex import get_maximum_opset_supported
 from ..common._topology import convert_topology
 from ._parse import parse_sparkml
 from . import operator_converters
+from ops_input_output import update_io_name_map
+from ops_names import update_sparkml_operator_name_map
+from ..common._registration import register_converter, register_shape_calculator
 
 
 def convert(model, name=None, initial_types=None, doc_string='', target_opset=None,
@@ -71,3 +74,16 @@ def convert(model, name=None, initial_types=None, doc_string='', target_opset=No
     onnx_model = convert_topology(topology, name, doc_string, target_opset, targeted_onnx)
 
     return onnx_model
+
+
+def update_registered_converter(model, alias, shape_fct, convert_fct, input_func,
+                                output_func, overwrite=True, parser=None, options=None):
+    # if (not overwrite and model in sparkml_operator_name_map
+    #         and alias != sparkml_operator_name_map[model]):
+    #     warnings.warn("Model '{0}' was already registered under alias "
+    #                   "'{1}'.".format(model, sparkml_operator_name_map[model]))
+    # TODO: Check inputs, error handling
+    update_sparkml_operator_name_map(model, alias)
+    update_io_name_map(alias, input_func, output_func)
+    register_converter(alias, convert_fct, overwrite=overwrite)
+    register_shape_calculator(alias, shape_fct, overwrite=overwrite)
