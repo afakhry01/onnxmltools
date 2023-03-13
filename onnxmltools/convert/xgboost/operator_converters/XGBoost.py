@@ -4,6 +4,7 @@ import json
 import numpy as np
 from onnx import TensorProto
 from xgboost import XGBClassifier
+from xgboost.spark.core import SparkXGBClassifierModel
 from ...common._registration import register_converter
 from ..common import get_xgb_params
 
@@ -319,9 +320,8 @@ class XGBClassifierConverter(XGBConverter):
 
 def convert_xgboost(scope, operator, container):
     xgb_node = operator.raw_operator
-    print(type(xgb_node))
-    print(getattr(xgb_node, 'operator_name', None))
     if (isinstance(xgb_node, XGBClassifier) or
+            isinstance(xgb_node, SparkXGBClassifierModel) or
             getattr(xgb_node, 'operator_name', None) == 'XGBClassifier'):
         cls = XGBClassifierConverter
     else:
