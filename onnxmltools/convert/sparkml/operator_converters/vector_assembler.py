@@ -3,7 +3,7 @@
 from ...common._registration import register_converter
 from ...common._registration import register_shape_calculator
 from ...common.utils import check_input_and_output_numbers
-from ...common.data_types import FloatTensorType, Int64TensorType
+from ...common.data_types import FloatTensorType, Int64TensorType, DoubleTensorType
 
 
 def convert_sparkml_vector_assembler(scope, operator, container):
@@ -31,6 +31,8 @@ def calculate_vector_assembler_shapes(operator):
     col_type = operator.inputs[0].type
     if isinstance(col_type, FloatTensorType):
         col_type = FloatTensorType([N, C])
+    elif isinstance(col_type, DoubleTensorType):
+        col_type = DoubleTensorType([N, C])
     elif isinstance(col_type, Int64TensorType):
         col_type = Int64TensorType([N, C])
     else:
